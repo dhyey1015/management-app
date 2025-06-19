@@ -1,12 +1,11 @@
-const express = require('express')
+import express from 'express';
 
 const router = express.Router()
 
 
 router.post('/login', async function(req, res){
-
-    res.status(200).json({
-        message: 'User created successfully',
+    res.json({
+        message: "hello"
     })
 })
 
