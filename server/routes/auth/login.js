@@ -13,7 +13,7 @@ const loginInput = z.object({
 
 router.post('/', async function(req, res){
     const data = req.body;
-    if(!data){
+    if(!data.email || !data.password){
         return res.status(400).json({
             message: "Please provide email, and password."
         });
@@ -25,15 +25,15 @@ router.post('/', async function(req, res){
             message: "Please provide proper inputs."
         })
     }
-
     const user = await prisma.user.findFirst({
         where:{
-            email: data.email
+            email: data.email,
+            password: data.password
         }
     })
     if(!user){
         return res.status(400).json({
-            message: "user does not exist for this email."
+            message: "Wrong email or password."
         })
     } else {
         const token = jwt.sign({

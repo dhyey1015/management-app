@@ -14,10 +14,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id          Int       @id @default(autoincrement())
-  email       String    @unique
-  userName    String
-  password    String
-  role        String?    @default("user")
+enum Role {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+model User {
+  id              Int           @id @default(autoincrement())
+  email           String        @unique
+  firstName       String
+  lastName        String
+  password        String
+  role            Role
+  createdAt       DateTime      @default(now())
+
+  // ADMIN: Admin can generate QR code and have users
+  shopName        String?
+  shopLogo        String?
+  address         String?
+  phoneNumber     String?
+  pincode         String?
+  gMapsLink       String?
+  qrCodes         QRCode[]      @relation("AdminQRCodes")
+  users           User[]        @relation("AdminUsers") // Users under this Admin
+  admin           User?         @relation("AdminUsers", fields: [adminId], references: [id])
+  adminId         Int?
+
+  // SUPERADMIN: Can create Admins
+  superAdmin      User?         @relation("SuperAdminAdmins", fields: [superAdminId], references: [id])
+  superAdminId    Int?
+  admins          User[]        @relation("SuperAdminAdmins") // SuperAdmin -> Admins
+}
+
+model QRCode {
+  id              Int           @id @default(autoincrement())
+  code            String        @unique
+  createdAt       DateTime      @default(now())
+  admin           User          @relation("AdminQRCodes", fields: [adminId], references: [id])
+  adminId         Int
 }
